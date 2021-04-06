@@ -4,8 +4,10 @@
 1 --generate-configuration 
 
 
-
-
+## Cykl red => green => refactor
+* RED = testy nie przechodzą =>
+* GREEN = Implementacja spełniająca warunki testowe =>
+* REFACTOR = Sprzątanie i optymalizacja =>
 
 ##Metoda 0,1,n,exception
 * 0 = Test dla pustego przypadki
