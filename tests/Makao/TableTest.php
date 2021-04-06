@@ -10,14 +10,22 @@ use PHPUnit\Framework\TestCase;
 
 class TableTest extends TestCase
 {
+    /**
+     * @var object|Table
+     */
+    private object $tableUnderTest;
+
+    public function setUp(): void
+    {
+        $this->tableUnderTest = new Table();
+    }
 
     public function testShouldCreateEmptyTable()
     {
         // Given
         $expected = 0;
-        $tableUnderTest = new Table();
         // When
-        $actual = $tableUnderTest->countPlayers();
+        $actual = $this->tableUnderTest->countPlayers();
         // Then
         $this->assertSame($expected, $actual);
 
@@ -28,11 +36,10 @@ class TableTest extends TestCase
     {
         // Given
         $expected = 1;
-        $tableUnderTest = new Table();
         $player = new Player();
         // When
-        $tableUnderTest->addPlayer($player);
-        $actual = $tableUnderTest->countPlayers();
+        $this->tableUnderTest->addPlayer($player);
+        $actual = $this->tableUnderTest->countPlayers();
         // Then
         $this->assertSame($expected, $actual);
     }
@@ -41,11 +48,10 @@ class TableTest extends TestCase
     {
         // Given
         $expected = 2;
-        $tableUnderTest = new Table();
         // When
-        $tableUnderTest->addPlayer(new Player());
-        $tableUnderTest->addPlayer(new Player());
-        $actual = $tableUnderTest->countPlayers();
+        $this->tableUnderTest->addPlayer(new Player());
+        $this->tableUnderTest->addPlayer(new Player());
+        $actual = $this->tableUnderTest->countPlayers();
         // Then
         $this->assertSame($expected, $actual);
     }
@@ -55,14 +61,12 @@ class TableTest extends TestCase
         // Expect
         $this->expectException(TooManyPlayersAtTheTableException::class);
         $this->expectExceptionMessage('Max capacity is 4 players');
-        // Given
-        $tableUnderTest = new Table();
         // When
-        $tableUnderTest->addPlayer(new Player());
-        $tableUnderTest->addPlayer(new Player());
-        $tableUnderTest->addPlayer(new Player());
-        $tableUnderTest->addPlayer(new Player());
-        $tableUnderTest->addPlayer(new Player());
+        $this->tableUnderTest->addPlayer(new Player());
+        $this->tableUnderTest->addPlayer(new Player());
+        $this->tableUnderTest->addPlayer(new Player());
+        $this->tableUnderTest->addPlayer(new Player());
+        $this->tableUnderTest->addPlayer(new Player());
     }
 
 }

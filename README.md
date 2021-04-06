@@ -15,3 +15,11 @@
 * N = Pozytywny scenariusz dla wielu elementów 
 * Exception = testy dla wszystkich wyjątków jakie mogą pojawić się w trakcie.
 
+##Setup klas testowych
+
+* public function setUp() = Jest uruchamiana przed każdym testem.
+* public function tearDown() = Jest uruchamiana po każdym teście.
+* public function setUpBeforeClass() = Jest uruchamiana tylko raz, przed pierwszym testem, na początku.
+* public function tearDownAfterClass() = Jest uruchamiana tylko raz, po ostatnim testem, na końcu.
+
+
