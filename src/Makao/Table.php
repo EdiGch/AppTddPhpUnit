@@ -8,6 +8,8 @@ use Makao\Player;
 
 class Table
 {
+    public const MAX_PLAYERS = 4;
+
     private $players = [];
 
     public function countPlayers(): int
@@ -17,9 +19,9 @@ class Table
 
     public function addPlayer(Player $player): void
     {
-        if($this->countPlayers() > Player::MAX_COUNT_PLAYERS - 1)
+        if($this->countPlayers() > self::MAX_PLAYERS - 1)
         {
-            throw new TooManyPlayersAtTheTableException('Max capacity is 4 players');
+            throw new TooManyPlayersAtTheTableException(self::MAX_PLAYERS);
         }
         $this->players[] = $player;
     }
