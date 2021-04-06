@@ -6,4 +6,8 @@ namespace Makao;
 class Table
 {
 
+    public function countPlayers()
+    {
+        return 0;
+    }
 }
