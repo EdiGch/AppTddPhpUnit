@@ -59,4 +59,25 @@ class CardCollectionTest extends TestCase
         // When
         $this->cardCollection->pickCard();
     }
+    
+    public function testShouldIteravleOnCardCollection()
+    {
+        // Given
+        $card = new Card();
+        // When & // Then
+        $this->cardCollection->add($card);
+        $this->assertTrue($this->cardCollection->valid());
+        $this->assertSame($card, $this->cardCollection->current());
+        $this->assertSame(0, $this->cardCollection->key());
+
+        $this->cardCollection->next();
+        $this->assertFalse($this->cardCollection->valid());
+        $this->assertSame(1, $this->cardCollection->key());
+
+        $this->cardCollection->rewind();
+        $this->assertTrue($this->cardCollection->valid());
+        $this->assertSame($card, $this->cardCollection->current());
+        $this->assertSame(0, $this->cardCollection->key());
+
+    }
 }
