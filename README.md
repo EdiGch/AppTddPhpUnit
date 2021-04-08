@@ -41,3 +41,9 @@ public function testShould()
 ![](docImage/docFromTest.PNG)
 
 
+## Testowanie funki języka php (przypadkowość)
+* adnotacje @codeCoverageIgnore dla klas wraperów
+* nigdy nie twórz logiki we wraperach
+* tworzyć serwisy jako wrapery dla funkcji php, które późnije możesz mockować
+* Reflection Api oraz Runkit to ostateczność 
+* Najczęstsze zastosowanie fo funkie losowe data i czas

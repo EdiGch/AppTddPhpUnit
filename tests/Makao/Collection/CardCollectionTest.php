@@ -31,7 +31,7 @@ class CardCollectionTest extends TestCase
     public function testShouldAddNewCardToCardToCardCollection()
     {
         // Given
-        $card = new Card();
+        $card = new Card(Card::COLOR_CLUB, Card::VALUE_EIGHT);
         // When
         $this->cardCollection->add($card);
         // Then
@@ -41,8 +41,8 @@ class CardCollectionTest extends TestCase
     public function testShouldAddNewCardsInChainToCardCollection()
     {
         // Given
-        $firstCard = new Card();
-        $secondCard = new Card();
+        $firstCard = new Card(Card::COLOR_CLUB, Card::VALUE_EIGHT);
+        $secondCard = new Card(Card::COLOR_HEART, Card::VALUE_QUEEN);
         // When
         $this->cardCollection
             ->add($firstCard)
@@ -64,7 +64,7 @@ class CardCollectionTest extends TestCase
     public function testShouldIteravleOnCardCollection()
     {
         // Given
-        $card = new Card();
+        $card = new Card(Card::COLOR_CLUB, Card::VALUE_EIGHT);
         // When & // Then
         $this->cardCollection->add($card);
         $this->assertTrue($this->cardCollection->valid());
@@ -85,8 +85,8 @@ class CardCollectionTest extends TestCase
     public function testShouldGetFirstCardFromCardCollectionAndRemoveThisCardFromDeck()
     {
         // Given
-        $firstCard = new Card();
-        $secondCard = new Card();
+        $firstCard = new Card(Card::COLOR_CLUB, Card::VALUE_EIGHT);
+        $secondCard = new Card(Card::COLOR_HEART, Card::VALUE_QUEEN);
         $this->cardCollection
             ->add($firstCard)
             ->add($secondCard);
@@ -107,8 +107,8 @@ class CardCollectionTest extends TestCase
         $this->expectExceptionMessage('You can not pic card from empty CardCollection');
 
         // Given
-        $firstCard = new Card();
-        $secondCard = new Card();
+        $firstCard = new Card(Card::COLOR_CLUB, Card::VALUE_EIGHT);
+        $secondCard = new Card(Card::COLOR_HEART, Card::VALUE_QUEEN);
         $this->cardCollection
             ->add($firstCard)
             ->add($secondCard);
@@ -130,9 +130,28 @@ class CardCollectionTest extends TestCase
         $this->expectExceptionMessage('You can not add card to collection as array. Use addCard() method!');
 
         // Given
-        $card = new Card();
+        $card = new Card(Card::COLOR_CLUB, Card::VALUE_EIGHT);
 
         // When
         $this->cardCollection[] = $card;
+    }
+    
+    public function testShouldShuffleCardsInCardCollention()
+    {
+        // Given
+        $firstCard = new Card(Card::COLOR_CLUB, Card::VALUE_EIGHT);
+        $secondCard = new Card(Card::COLOR_HEART, Card::VALUE_QUEEN);
+        $this->cardCollection
+            ->add($firstCard)
+            ->add($secondCard);
+        // When
+        $this->cardCollection->shuffle();
+        // Then
+        $card = $this->cardCollection->pickCard();
+        $this->assertSame($secondCard, $card);
+
+        $card = $this->cardCollection->pickCard();
+        $this->assertSame($firstCard, $card);
+
     }
 }

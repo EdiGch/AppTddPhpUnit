@@ -106,5 +106,10 @@ class CardCollection implements \Countable, \Iterator, \ArrayAccess
         unset($this->cards[$offset]);
     }
 
+    public function shuffle()
+    {
+        shuffle($this->cards);
+    }
+
 
 }
