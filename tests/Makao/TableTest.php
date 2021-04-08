@@ -31,7 +31,6 @@ class TableTest extends TestCase
 
     }
 
-
     public function testShouldAddOnePlayerToTable()
     {
         // Given
