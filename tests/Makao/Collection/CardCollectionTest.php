@@ -135,23 +135,17 @@ class CardCollectionTest extends TestCase
         // When
         $this->cardCollection[] = $card;
     }
-    
-    public function testShouldShuffleCardsInCardCollention()
+
+    public function testShouldReturnCollectionAsArray()
     {
         // Given
-        $firstCard = new Card(Card::COLOR_CLUB, Card::VALUE_EIGHT);
-        $secondCard = new Card(Card::COLOR_HEART, Card::VALUE_QUEEN);
-        $this->cardCollection
-            ->add($firstCard)
-            ->add($secondCard);
+        $carts = [
+            new Card(Card::COLOR_CLUB, Card::VALUE_EIGHT),
+            new Card(Card::COLOR_HEART, Card::VALUE_QUEEN),
+        ];
         // When
-        $this->cardCollection->shuffle();
+        $actual = new CardCollection($carts);
         // Then
-        $card = $this->cardCollection->pickCard();
-        $this->assertSame($secondCard, $card);
-
-        $card = $this->cardCollection->pickCard();
-        $this->assertSame($firstCard, $card);
-
+        $this->assertEquals($carts, $actual->toArray());
     }
 }

@@ -11,6 +11,16 @@ class CardService
 {
 
     /**
+     * @var ShuffleService
+     */
+    private ShuffleService $shuffleService;
+
+    public function __construct(ShuffleService $shuffleService)
+    {
+        $this->shuffleService = $shuffleService;
+    }
+
+    /**
      * @return CardCollection
      */
     public function createDeck(): CardCollection
@@ -24,6 +34,13 @@ class CardService
         }
 
         return $deck;
+    }
+
+    public function shuffle(CardCollection $cardCollection): CardCollection
+    {
+        return new CardCollection(
+            $this->shuffleService->shuffle($cardCollection->toArray())
+        );
     }
 
 

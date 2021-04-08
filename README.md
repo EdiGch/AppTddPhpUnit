@@ -47,3 +47,14 @@ public function testShould()
 * tworzyć serwisy jako wrapery dla funkcji php, które późnije możesz mockować
 * Reflection Api oraz Runkit to ostateczność 
 * Najczęstsze zastosowanie fo funkie losowe data i czas
+
+## Wstrzykiwanie zależności 
+* Słowo new jest zarezerwowane tylko dla obiektów POPO
+* Wymagane zależności wstrzykujemy przez __constructor() bazując na interfajsie
+* Opcjonalne zależności wstrzykuj przez settery 
+* Jedna klasa powinna mieć jedną odpowiedzialność 
+* Wszystkie zależności w klasie testowej mockujemy definiując ich zachowanie
+* Testowanie prawdziwych zależności odbywa się na poziomie integracyjnym lub funkcjonalnym
+
+
+

@@ -23,6 +23,11 @@ class CardCollection implements \Countable, \Iterator, \ArrayAccess
      */
     private int $position = 0;
 
+    public function __construct(array $cards = [])
+    {
+        $this->cards = $cards;
+    }
+
     /**
      * @return int|void
      */
@@ -96,20 +101,19 @@ class CardCollection implements \Countable, \Iterator, \ArrayAccess
         return $this->cards[$offset];
     }
 
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         throw new MethodNotAllowedException('You can not add card to collection as array. Use addCard() method!');
     }
 
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         unset($this->cards[$offset]);
     }
 
-    public function shuffle()
+    public function toArray(): array
     {
-        shuffle($this->cards);
+        return $this->cards;
     }
-
 
 }
