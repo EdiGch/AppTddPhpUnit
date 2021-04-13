@@ -7,7 +7,10 @@ use Makao\Card;
 use Makao\Collection\CardCollection;
 use Makao\Exception\TooManyPlayersAtTheTableException;
 use Makao\Player;
+use Makao\Service\CardService;
+use Makao\Service\GameService;
 use Makao\Table;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class TableTest extends TestCase
@@ -93,6 +96,21 @@ class TableTest extends TestCase
         $actual = $table->getCardDeck();
         // Then
         $this->assertSame($cards, $actual);
+    }
+
+    public function testShouldAddCardCollectionToCardDeckOnTable()
+    {
+        // Given
+        $cardCollection = new CardCollection(
+            [
+                new Card(Card::COLOR_DIAMOND, Card::VALUE_FOUR),
+                new Card(Card::COLOR_SPADE, Card::VALUE_FIVE),
+            ]
+        );
+        // When
+        $actual = $this->tableUnderTest->addCardCollectionToDeck($cardCollection);
+        // Then
+        $this->assertEquals($cardCollection, $actual->getCardDeck());
     }
 
 }

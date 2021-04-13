@@ -148,4 +148,17 @@ class CardCollectionTest extends TestCase
         // Then
         $this->assertEquals($carts, $actual->toArray());
     }
+
+    public function testShouldAddCardCollectionToCardCollection()
+    {
+        // Given
+        $collection = new CardCollection([
+            new Card(Card::COLOR_CLUB, Card::VALUE_EIGHT),
+            new Card(Card::COLOR_HEART, Card::VALUE_QUEEN),
+        ]);
+        // When
+        $actual = $this->cardCollection->addCollection($collection);
+        // Then
+        $this->assertEquals($collection, $actual);
+    }
 }

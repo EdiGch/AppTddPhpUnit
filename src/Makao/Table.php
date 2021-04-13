@@ -53,4 +53,10 @@ class Table
     {
         return $this->cardDack;
     }
+
+    public function addCardCollectionToDeck(CardCollection $cardCollection): self
+    {
+        $this->cardDack->addCollection($cardCollection);
+            return $this;
+    }
 }
