@@ -69,6 +69,22 @@ class PlayerTest extends TestCase
         $this->assertSame($secondCard, $actual->pickCard());
         $this->assertSame($thirdCard, $cardCollection->pickCard());
     }
+
+    public function testShouldAllowPickChosenCardFromPlayerCardCollection()
+    {
+        // Given
+        $firstCard = new Card(Card::COLOR_HEART, Card::VALUE_JACK);
+        $secondCard = new Card(Card::COLOR_DIAMOND, Card::VALUE_THREE);
+        $thirdCard = new Card(Card::COLOR_SPADE, Card::VALUE_TEN);
+        $cardCollection = new CardCollection([$firstCard, $secondCard, $thirdCard]);
+
+        $player = new Player('Andy', $cardCollection);
+
+        // When
+        $actual = $player->pickCard(2);
+        // Then
+        $this->assertSame($thirdCard, $actual);
+    }
     
     public function testShouldAllowPlayerSaysMakao()
     {

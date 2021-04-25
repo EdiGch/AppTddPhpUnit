@@ -56,14 +56,14 @@ class CardCollection implements \Countable, \Iterator, \ArrayAccess
         return $this;
     }
 
-    public function pickCard()
+    public function pickCard(int $index = self::FIRST_CARD_INDEX)
     {
         if (empty($this->cards)) {
             throw new CardNotFoundException('You can not pic card from empty CardCollection');
         }
 
-        $pickedCard = $this->cards[self::FIRST_CARD_INDEX];
-        $this->offsetUnset(self::FIRST_CARD_INDEX);
+        $pickedCard = $this->cards[$index];
+        $this->offsetUnset($index);
         $this->cards = array_values($this->cards);
 
         return $pickedCard;

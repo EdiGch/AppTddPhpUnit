@@ -5,10 +5,22 @@ declare(strict_types=1);
 namespace Makao;
 
 
+use Makao\Exception\CardDuplicationException;
 use PHPUnit\Framework\TestCase;
 
 class CardValidatorTest extends TestCase
 {
+
+    /**
+     * @var CardValidator
+     */
+    private CardValidator $cardValidatorUnderTest;
+
+    protected function setUp(): void
+    {
+        $this->cardValidatorUnderTest = new CardValidator();
+    }
+
     public function cardsProvider()
     {
         return [
@@ -39,11 +51,21 @@ class CardValidatorTest extends TestCase
      */
     public function testShouldValidCards(Card $activeCard, Card $newCard, bool $expected)
     {
-        // Given
-        $cardValidator = new CardValidator();
         // When
-        $actual = $cardValidator->valid($activeCard, $newCard);
+        $actual = $this->cardValidatorUnderTest->valid($activeCard, $newCard);
         // Then
         $this->assertSame($expected, $actual);
+    }
+    
+    public function testShouldThrowCardDuplicationExceptionWhenValidCardsAreTheSame()
+    {
+        // Expect
+        $this->expectException(CardDuplicationException::class);
+        $this->expectExceptionMessage('Valid card get the same cards: 5 spade');
+        // Given
+        $card = new Card(Card::COLOR_SPADE, Card::VALUE_FIVE);
+    
+        // When
+        $this->cardValidatorUnderTest->valid($card, $card);
     }
 }
