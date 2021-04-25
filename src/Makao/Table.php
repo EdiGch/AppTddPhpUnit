@@ -25,10 +25,10 @@ class Table
      */
     private CardCollection $playedCard;
 
-    public function __construct(CardCollection $cardDack = null)
+    public function __construct(CardCollection $cardDack = null, CardCollection $playedCard = null )
     {
         $this->cardDack = $cardDack ?? new CardCollection();
-        $this->playedCard = new CardCollection();
+        $this->playedCard = $playedCard ?? new CardCollection();
 
     }
 
