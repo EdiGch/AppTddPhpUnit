@@ -13,6 +13,8 @@ class Table
 
     private $players = [];
 
+    private $currentIndexPlayer = 0;
+
     /**
      * @var CardCollection
      */
@@ -58,5 +60,27 @@ class Table
     {
         $this->cardDack->addCollection($cardCollection);
             return $this;
+    }
+
+    public function getCurrentPlayer(): Player
+    {
+        return $this->players[$this->currentIndexPlayer];
+    }
+
+    public function getNextPlayer(): Player
+    {
+        return $this->players[$this->currentIndexPlayer + 1] ?? $this->players[0];
+    }
+
+    public function getPreviousPlayer(): Player
+    {
+        return $this->players[$this->currentIndexPlayer - 1] ?? $this->players[$this->countPlayers() - 1];
+    }
+
+    public function finishRound(): void
+    {
+        if (++$this->currentIndexPlayer === $this->countPlayers()) {
+            $this->currentIndexPlayer = 0;
+        }
     }
 }
