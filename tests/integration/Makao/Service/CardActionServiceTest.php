@@ -165,4 +165,39 @@ class CardActionServiceTest extends TestCase
         $this->assertSame($this->player3, $this->table->getCurrentPlayer());
     }
 
+    //TODO Dla karty numer 3
+
+    public function testShouldSkipRoundForNextPlayerWhenCardDourWasDropped()
+    {
+        // Given
+        $card = new Card(Card::COLOR_SPADE, Card::VALUE_FOUR);
+
+        $this->player2->getCards()->add(
+            new Card(Card::COLOR_HEART, Card::VALUE_FOUR)
+        );
+
+        $this->player3->getCards()->add(
+            new Card(Card::COLOR_DIAMOND, Card::VALUE_FOUR)
+        );
+
+        // When
+        $this->cardActionServiceUnderTest->afterCard($card);
+        // Then
+        $this->assertSame($this->player2, $this->table->getCurrentPlayer());
+        $this->assertEquals(2, $this->player1->getRoundToSkip());
+        $this->assertFalse($this->player1->canPlayRound());
+        $this->assertTrue($this->player2->canPlayRound());
+        $this->assertTrue($this->player3->canPlayRound());
+    }
+    
+    public function testShouldSkipManyRoundsForNextPlayerWhenCardFourWasDroppedAndNextPlayersHaveCardsFourToDefend()
+    {
+        // Given
+        $card = new Card(Card::COLOR_SPADE, Card::VALUE_FOUR);
+        // When
+        $this->cardActionServiceUnderTest->afterCard($card);
+        // Then
+        $this->assertSame($this->player3, $this->table->getCurrentPlayer());
+    }
+
 }

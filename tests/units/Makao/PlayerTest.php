@@ -131,4 +131,45 @@ class PlayerTest extends TestCase
         // Then
         $this->assertSame($card, $actual);
     }
+
+    public function testShouldReturnTrueWhenPlayerCanPlayRound()
+    {
+        // Given
+        $player = new Player('Andy');
+        // When
+        $actual = $player->canPlayRound();
+        // Then
+        $this->assertTrue($actual);
+    }
+    
+    public function testShouldReturnFalseWhenPlayerCanNotPlayRound()
+    {
+        // Given
+        $player = new Player('Andy');
+        // When
+        $player->addRoundToSkip();
+        // Then
+        $this->assertFalse($player->canPlayRound());
+    }
+    
+    public function testShouldSkipmanyRoundsAndBackToPlayerAfter()
+    {
+        // Given
+        $player = new Player('Andy');
+        // When & Then
+        $this->assertTrue($player->canPlayRound());
+
+        $player->addRoundToSkip(2);
+        $this->assertFalse($player->canPlayRound());
+        $this->assertSame(2, $player->getRoundToSkip());
+
+        $player->skipRound();
+        $this->assertFalse($player->canPlayRound());
+        $this->assertSame(1, $player->getRoundToSkip());
+
+        $player->skipRound();
+        $this->assertTrue($player->canPlayRound());
+        $this->assertSame(0, $player->getRoundToSkip());
+    }
+    
 }

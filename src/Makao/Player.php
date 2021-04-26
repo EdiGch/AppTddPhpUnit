@@ -14,6 +14,7 @@ class Player
      * @var CardCollection
      */
     private CardCollection $cardCollection;
+    private int $roundToSkip = 0;
 
     public function __construct(string $name, CardCollection $cardCollection = null)
     {
@@ -58,6 +59,28 @@ class Player
         }
 
         throw new CardNotFoundException('Player has not card with value ' . $valueTwo);
+    }
+
+    public function getRoundToSkip(): int
+    {
+        return $this->roundToSkip;
+    }
+
+    public function canPlayRound(): bool
+    {
+        return $this->getRoundToSkip() === 0;
+    }
+
+    public function addRoundToSkip(int $rounds = 1): self
+    {
+        $this->roundToSkip += $rounds;
+        return $this;
+    }
+
+    public function skipRound(): self
+    {
+        --$this->roundToSkip;
+        return $this;
     }
 
 }

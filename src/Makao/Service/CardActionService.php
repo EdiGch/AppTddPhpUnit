@@ -19,6 +19,7 @@ class CardActionService
      * @var int
      */
     private int $cardToGet = 0;
+    private int $actionCount = 0;
 
     public function __construct(Table $table)
     {
@@ -31,6 +32,12 @@ class CardActionService
         switch ($card->getValue()){
             case Card::VALUE_TWO:
                 $this->cardTwoAction();
+                break;
+            case Card::VALUE_THREE:
+                $this->cardTwoAction();
+                break;
+            case Card::VALUE_FOUR:
+                $this->skipRound();
                 break;
             default:
                 break;
@@ -58,6 +65,21 @@ class CardActionService
     {
         $this->table->getCurrentPlayer()->takeCards($this->table->getCardDeck(), $count);
         $this->table->finishRound();
+    }
+
+    private function skipRound(): void
+    {
+        ++$this->actionCount;
+        $player = $this->table->getCurrentPlayer();
+        try{
+            $card = $player->pickCardByValue(Card::VALUE_FOUR);
+            $this->table->getPlayedCards()->add($card);
+            $this->table->finishRound();
+            $this->skipRound();
+        } catch (CardNotFoundException $exception) {
+            $player->addRoundToSkip($this->actionCount -1);
+            $this->table->finishRound();
+        }
     }
 
 
