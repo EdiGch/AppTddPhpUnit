@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Makao;
 
 use Makao\Collection\CardCollection;
+use Makao\Exception\CardNotFoundException;
 
 class Player
 {
@@ -46,6 +47,17 @@ class Player
     public function sayMakao(): string
     {
         return self::MAKAO;
+    }
+
+    public function pickCardByValue(string $valueTwo): Card
+    {
+        foreach ($this->cardCollection as $index => $card) {
+            if ($valueTwo === $card->getValue()) {
+                return $this->pickCard($index);
+            }
+        }
+
+        throw new CardNotFoundException('Player has not card with value ' . $valueTwo);
     }
 
 }

@@ -6,6 +6,7 @@ namespace Makao;
 
 
 use Makao\Collection\CardCollection;
+use Makao\Exception\CardNotFoundException;
 use PHPUnit\Framework\TestCase;
 
 class PlayerTest extends TestCase
@@ -94,5 +95,40 @@ class PlayerTest extends TestCase
         $actual = $player->sayMakao();
         // Then
         $this->assertEquals('Makao', $actual);
+    }
+    
+    public function testShouldThrowCardNotFoundExceptionWhenPlayerTryPickCardByValueAndHasNotCorrectCardInHand()
+    {
+        // Expect
+        $this->expectException(CardNotFoundException::class);
+        $this->expectExceptionMessage('Player has not card with value 2');
+
+        // Given
+        $player = new Player('Andy');
+        // When
+        $player->pickCardByValue(Card::VALUE_TWO);
+    }
+
+    public function testShouldReturnPickCardByValueWhenPlayerHasCorrectCard()
+    {
+        // Given
+        $card = new Card(Card::COLOR_HEART, Card::VALUE_TWO);
+        $player = new Player('Andy', new CardCollection([$card]));
+        // When
+        $actual = $player->pickCardByValue(Card::VALUE_TWO);
+        // Then
+        $this->assertSame($card, $actual);
+    }
+
+    public function testShouldReturnFirstCardByPickCardByValueWhenPlayerHasMoreCorrectCard()
+    {
+        // Given
+        $card = new Card(Card::COLOR_HEART, Card::VALUE_TWO);
+        $nextCard = new Card(Card::COLOR_SPADE, Card::VALUE_TWO);
+        $player = new Player('Andy', new CardCollection([$card, $nextCard]));
+        // When
+        $actual = $player->pickCardByValue(Card::VALUE_TWO);
+        // Then
+        $this->assertSame($card, $actual);
     }
 }
