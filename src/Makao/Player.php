@@ -52,13 +52,23 @@ class Player
 
     public function pickCardByValue(string $valueTwo): Card
     {
+       return $this->pickCardByValueAndColor($valueTwo);
+    }
+
+    public function pickCardByValueAndColor(string $value, string $color = null): Card
+    {
         foreach ($this->cardCollection as $index => $card) {
-            if ($valueTwo === $card->getValue()) {
+            if ($value === $card->getValue() && is_null($color) || $color === $card->getColor()) {
                 return $this->pickCard($index);
             }
         }
 
-        throw new CardNotFoundException('Player has not card with value ' . $valueTwo);
+        $message = 'Player has not card with value ' . $value;
+        if (!is_null($color)) {
+            $message .= ' and color ' . $color;
+        }
+
+        throw new CardNotFoundException($message);
     }
 
     public function pickCardsByValue(string $cardValue): CardCollection
