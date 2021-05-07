@@ -330,4 +330,15 @@ class CardActionServiceTest extends TestCase
         $this->assertSame($this->player2, $this->table->getCurrentPlayer());
     }
 
+    public function testShouldChangeColorToPlayOnTableAfterCardAce()
+    {
+        // Given
+        $requestColor = Card::COLOR_HEART;
+        $card = new Card(Card::COLOR_SPADE, Card::VALUE_ACE);
+        // When & Then
+        $this->assertEquals(Card::COLOR_SPADE, $this->table->getPlayedCardColor());
+        $this->cardActionServiceUnderTest->afterCard($card, $requestColor);
+        $this->assertEquals(Card::COLOR_HEART, $this->table->getPlayedCardColor());
+    }
+
 }

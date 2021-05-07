@@ -45,6 +45,9 @@ class CardActionService
             case Card::VALUE_KING:
                 $this->afterKing($card->getColor());
                 break;
+            case Card::VALUE_ACE:
+                $this->changePlayedColorCardOnTable($request);
+                break;
             default:
                 break;
         }
@@ -56,7 +59,7 @@ class CardActionService
         $player = $this->table->getCurrentPlayer();
         try{
             $card = $player->pickCardByValue(Card::VALUE_TWO);
-            $this->table->getPlayedCards()->add($card);
+            $this->table->addPlayedCard($card);
             $this->table->finishRound();
             $this->cardTwoAction();
         } catch (CardNotFoundException $exception) {
@@ -76,7 +79,7 @@ class CardActionService
         $player = $this->table->getCurrentPlayer();
         try{
             $card = $player->pickCardByValue(Card::VALUE_FOUR);
-            $this->table->getPlayedCards()->add($card);
+            $this->table->addPlayedCard($card);
             $this->table->finishRound();
             $this->skipRound();
         } catch (CardNotFoundException $exception) {
@@ -93,7 +96,7 @@ class CardActionService
 
             try{
                 $cards = $player->pickCardsByValue($cardValue);
-                $this->table->getPlayedCards()->addCollection($cards);
+                $this->table->addPlayedCards($cards);
             } catch(CardNotFoundException $e) {
                 $player->takeCards($this->table->getCardDeck());
             }
@@ -120,7 +123,7 @@ class CardActionService
     {
         try{
             $card = $this->table->getCurrentPlayer()->pickCardByValueAndColor(Card::VALUE_KING, Card::COLOR_SPADE);
-            $this->table->getPlayedCards()->add($card);
+            $this->table->addPlayedCard($card);
             $this->table->finishRound();
             $this->afterKing(Card::COLOR_SPADE);
         } catch (CardNotFoundException $e) {
@@ -134,12 +137,17 @@ class CardActionService
         $this->table->backRound();
         try{
             $card = $this->table->getPreviousPlayer()->pickCardByValueAndColor(Card::VALUE_KING,Card::COLOR_HEART);
-            $this->table->getPlayedCards()->add($card);
+            $this->table->addPlayedCard($card);
             $this->afterKing(Card::COLOR_HEART);
         } catch (CardNotFoundException $e) {
             $this->table->backRound();
             $this->playerTakeCards($this->actionCount);
         }
+    }
+
+    private function changePlayedColorCardOnTable(string $color): void
+    {
+        $this->table->changePlayedCardColor($color);
     }
 
 

@@ -5,6 +5,7 @@ namespace Tests\Makao;
 
 use Makao\Card;
 use Makao\Collection\CardCollection;
+use Makao\Exception\CardNotFoundException;
 use Makao\Exception\TooManyPlayersAtTheTableException;
 use Makao\Player;
 use Makao\Service\CardService;
@@ -239,6 +240,38 @@ class TableTest extends TestCase
         $this->assertSame($player2, $this->tableUnderTest->getNextPlayer());
         $this->assertSame($player3, $this->tableUnderTest->getPreviousPlayer());
 
+    }
+
+    public function testShouldThrowCardNotFoundExceptionWhentGetPlayedCardColorOnEmptyTable()
+    {
+        // Expect
+        $this->expectException(CardNotFoundException::class);
+        $this->expectExceptionMessage('No played cards on the table yet!');
+        // When
+        $this->tableUnderTest->getPlayedCardColor();
+    }
+    
+    public function testShouldReturnPlayedCardColorSetByAddPlayedCard()
+    {
+        // When
+        $this->tableUnderTest->addPlayedCard(new Card(Card::COLOR_CLUB, Card::VALUE_FIVE));
+        // Then
+        $this->assertEquals(Card::COLOR_CLUB, $this->tableUnderTest->getPlayedCardColor());
+    }
+
+    public function testShouldReturnPlayedCardsColorSetByAddPlayedCard()
+    {
+        $collection = new CardCollection(
+            [
+                new Card(Card::COLOR_CLUB, Card::VALUE_FIVE),
+                new Card(Card::COLOR_DIAMOND, Card::VALUE_FIVE)
+            ]
+        );
+
+        // When
+        $this->tableUnderTest->addPlayedCards($collection);
+        // Then
+        $this->assertEquals(Card::COLOR_DIAMOND, $this->tableUnderTest->getPlayedCardColor());
     }
 
 }
