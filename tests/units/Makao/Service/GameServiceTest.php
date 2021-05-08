@@ -7,6 +7,7 @@ namespace Makao\Service;
 
 use Makao\Card;
 use Makao\Collection\CardCollection;
+use Makao\Exception\GameException;
 use Makao\Player;
 use Makao\Table;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -60,6 +61,23 @@ class GameServiceTest extends TestCase
     
     public function testShouldReturnTrueWhenGameIsStarted()
     {
+        // Given
+        $this->gamseServiceUnderTest->getTable()->addCardCollectionToDeck(
+            new CardCollection(
+                [
+                    new Card(Card::COLOR_DIAMOND, Card::VALUE_FOUR),
+                ]
+            )
+        );
+
+        $this->gamseServiceUnderTest->addPlayers(
+            [
+                new Player('Andy'),
+                new Player('Tom'),
+                new Player('Greg'),
+            ]
+        );
+
         // When
         $this->gamseServiceUnderTest->startGame();
         $actual = $this->gamseServiceUnderTest->isStarted();
@@ -103,5 +121,31 @@ class GameServiceTest extends TestCase
         $this->assertCount(2, $table->getCardDeck());
         $this->assertCount(0, $table->getPlayedCards());
         $this->assertEquals($shuffledCardCollection, $table->getCardDeck());
+    }
+
+    public function testShouldThrowExceptionWhenStartGameWithoutCardDeck()
+    {
+        // Expect
+        $this->expectException(GameException::class);
+        $this->expectExceptionMessage('Prepare card deck before game start');
+        // When
+        $this->gamseServiceUnderTest->startGame();
+    }
+
+    public function testShouldThrowExceptionWhenStartGameWithoutMinimalPlayers()
+    {
+        // Given
+        $this->gamseServiceUnderTest->getTable()->addCardCollectionToDeck(
+            new CardCollection(
+                [
+                    new Card(Card::COLOR_DIAMOND, Card::VALUE_FOUR),
+                ]
+            )
+        );
+        // Expect
+        $this->expectException(GameException::class);
+        $this->expectExceptionMessage('You need minimum 2 players to start game');
+        // When
+        $this->gamseServiceUnderTest->startGame();
     }
 }

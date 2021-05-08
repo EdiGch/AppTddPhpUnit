@@ -6,6 +6,7 @@ namespace Makao\Service;
 
 use Makao\Card;
 use Makao\Collection\CardCollection;
+use Makao\Exception\CardNotFoundException;
 
 class CardService
 {
@@ -41,6 +42,40 @@ class CardService
         return new CardCollection(
             $this->shuffleService->shuffle($cardCollection->toArray())
         );
+    }
+
+    public function pickFirstNoActionCard(CardCollection $collection): Card
+    {
+        $firstCard = null;
+        $card = $collection->pickCard();
+
+        while ($this->isAction($card) && $firstCard !== $card) {
+            $collection->add($card);
+
+            if (is_null($firstCard)) {
+                $firstCard = $card;
+            }
+            $card = $collection->pickCard();
+        }
+
+        if ($this->isAction($card)) {
+            throw new CardNotFoundException('No regular cards in collection');
+        }
+
+        return $card;
+    }
+
+    private function isAction(Card $card): bool
+    {
+        return in_array($card->getValue(), [
+           Card::VALUE_TWO,
+           Card::VALUE_THREE,
+           Card::VALUE_FOUR,
+           Card::VALUE_JACK,
+           Card::VALUE_QUEEN,
+           Card::VALUE_KING,
+           Card::VALUE_ACE,
+        ]);
     }
 
 

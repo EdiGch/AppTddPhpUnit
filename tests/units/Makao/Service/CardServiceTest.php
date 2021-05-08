@@ -8,6 +8,7 @@ namespace Tests\Makao\Service;
 
 use Makao\Card;
 use Makao\Collection\CardCollection;
+use Makao\Exception\CardNotFoundException;
 use Makao\Service\CardService;
 use Makao\Service\ShuffleService;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -68,5 +69,86 @@ class CardServiceTest extends TestCase
         // Then
         $this->assertNotEquals($cardCollection, $actual);
         $this->assertEquals($cardCollection->pickCard(), $actual[51]);
+    }
+
+    public function testShouldPickFirstNoActionCardFromCollection()
+    {
+        // Given
+        $noActionCard = new Card(Card::COLOR_CLUB, Card::VALUE_FIVE);
+        $collection = new CardCollection(
+            [
+                new Card(Card::COLOR_CLUB, Card::VALUE_TWO),
+                new Card(Card::COLOR_CLUB, Card::VALUE_THREE),
+                new Card(Card::COLOR_CLUB, Card::VALUE_FOUR),
+                new Card(Card::COLOR_CLUB, Card::VALUE_JACK),
+                new Card(Card::COLOR_CLUB, Card::VALUE_QUEEN),
+                new Card(Card::COLOR_CLUB, Card::VALUE_KING),
+                new Card(Card::COLOR_CLUB, Card::VALUE_ACE),
+                $noActionCard
+            ]
+        );
+        // When
+        $actual = $this->cardServiceUnderTest->pickFirstNoActionCard($collection);
+        // Then
+        $this->assertCount(7, $collection);
+        $this->assertSame($noActionCard, $actual);
+    }
+
+    public function testShouldThrowCardNotFoundExceptionWhenPickFirstNoActionCardFromCollectionWithOnlyActionCards()
+    {
+        // Expect
+        $this->expectException(CardNotFoundException::class);
+        $this->expectExceptionMessage('No regular cards in collection');
+        // Given
+        $collection = new CardCollection(
+            [
+                new Card(Card::COLOR_CLUB, Card::VALUE_TWO),
+                new Card(Card::COLOR_CLUB, Card::VALUE_THREE),
+                new Card(Card::COLOR_CLUB, Card::VALUE_FOUR),
+                new Card(Card::COLOR_CLUB, Card::VALUE_JACK),
+                new Card(Card::COLOR_CLUB, Card::VALUE_QUEEN),
+                new Card(Card::COLOR_CLUB, Card::VALUE_KING),
+                new Card(Card::COLOR_CLUB, Card::VALUE_ACE),
+            ]
+        );
+        // When
+        $this->cardServiceUnderTest->pickFirstNoActionCard($collection);
+    }
+
+    public function testShouldPickFirstNoActionCardFromCollectionAndMovePriviousActionCardsOnTheEnd()
+    {
+        // Given
+        $noActionCard = new Card(Card::COLOR_CLUB, Card::VALUE_FIVE);
+        $collection = new CardCollection(
+            [
+                new Card(Card::COLOR_CLUB, Card::VALUE_TWO),
+                new Card(Card::COLOR_CLUB, Card::VALUE_THREE),
+                new Card(Card::COLOR_CLUB, Card::VALUE_FOUR),
+                $noActionCard,
+                new Card(Card::COLOR_CLUB, Card::VALUE_JACK),
+                new Card(Card::COLOR_CLUB, Card::VALUE_QUEEN),
+                new Card(Card::COLOR_CLUB, Card::VALUE_KING),
+                new Card(Card::COLOR_CLUB, Card::VALUE_ACE),
+            ]
+        );
+
+        $expectCollection = new CardCollection(
+            [
+                new Card(Card::COLOR_CLUB, Card::VALUE_JACK),
+                new Card(Card::COLOR_CLUB, Card::VALUE_QUEEN),
+                new Card(Card::COLOR_CLUB, Card::VALUE_KING),
+                new Card(Card::COLOR_CLUB, Card::VALUE_ACE),
+                new Card(Card::COLOR_CLUB, Card::VALUE_TWO),
+                new Card(Card::COLOR_CLUB, Card::VALUE_THREE),
+                new Card(Card::COLOR_CLUB, Card::VALUE_FOUR),
+            ]
+        );
+
+        // When
+        $actual = $this->cardServiceUnderTest->pickFirstNoActionCard($collection);
+        // Then
+        $this->assertCount(7, $collection);
+        $this->assertSame($noActionCard, $actual);
+        $this->assertEquals($expectCollection, $collection);
     }
 }
