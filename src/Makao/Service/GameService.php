@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Makao\Service;
 
 
+use Makao\Exception\CardNotFoundException;
 use Makao\Exception\GameException;
 use Makao\Service\CardSelector\CardSelectorInterface;
 use Makao\Table;
@@ -104,13 +105,23 @@ class GameService
     {
         $player = $this->table->getCurrentPlayer();
 
-        $card = $this->cardSelector->chooseCard(
-            $player,
-            $this->table->getPlayedCards()->getLastCard(),
-            $this->table->getPlayedCardColor()
-        );
+        if (!$player->canPlayRound()) {
+            $this->table->finishRound();
+            return;
+        }
 
-        $this->table->addPlayedCard($card);
-        $this->cardActionService->afterCard($card);
+        try {
+            $card = $this->cardSelector->chooseCard(
+                $player,
+                $this->table->getPlayedCards()->getLastCard(),
+                $this->table->getPlayedCardColor()
+            );
+
+            $this->table->addPlayedCard($card);
+            $this->cardActionService->afterCard($card);
+        } catch (CardNotFoundException $e) {
+            $player->takeCards($this->table->getCardDeck());
+            $this->table->finishRound();
+        }
     }
 }
