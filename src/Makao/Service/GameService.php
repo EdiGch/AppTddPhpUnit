@@ -11,6 +11,7 @@ use Makao\Table;
 class GameService
 {
     const MINIMAL_PLAYERS = 2;
+    const COUNT_START_PLAYER_CARDS = 5;
     /**
      * @var Table
      */
@@ -50,7 +51,21 @@ class GameService
     public function startGame(): void
     {
         $this->validateBeforeStartGame();
-        $this->isStarted = true;
+        $cadDeck = $this->table->getCardDeck();
+
+        try {
+            $this->isStarted = true;
+
+            $card = $this->cardService->pickFirstNoActionCard($this->table->getCardDeck());
+            $this->table->addPlayedCard($card);
+
+            foreach ($this->table->getPlayers() as $player) {
+                $player->takeCards($cadDeck, self::COUNT_START_PLAYER_CARDS);
+            }
+        } catch (\Exception $exception) {
+            throw new GameException('The game needs help!', $exception);
+        }
+
     }
 
     public function prepareCardDeck(): Table

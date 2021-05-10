@@ -7,15 +7,17 @@ namespace Makao\Service;
 
 use Makao\Card;
 use Makao\Collection\CardCollection;
+use Makao\Exception\CardNotFoundException;
 use Makao\Exception\GameException;
 use Makao\Player;
 use Makao\Table;
+use phpDocumentor\Reflection\Types\Collection;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class GameServiceTest extends TestCase
 {
-    private  $gamseServiceUnderTest;
+    private  $gameServiceUnderTest;
 
     /** @var MockObject | CardService $cardServiceMock */
     private  $cardServiceMock;
@@ -23,13 +25,13 @@ class GameServiceTest extends TestCase
     protected function setUp(): void
     {
         $this->cardServiceMock = $this->createMock(CardService::class);
-        $this->gamseServiceUnderTest = new GameService(new Table(), $this->cardServiceMock);
+        $this->gameServiceUnderTest = new GameService(new Table(), $this->cardServiceMock);
     }
 
     public function testShouldReturnFalseWhenGameIsNotStarted()
     {
         // When
-        $actual = $this->gamseServiceUnderTest->isStarted();
+        $actual = $this->gameServiceUnderTest->isStarted();
         // Then
         $this->assertFalse($actual);
     }
@@ -37,7 +39,7 @@ class GameServiceTest extends TestCase
     public function testShouldInitNewGameWithEmptyTable()
     {
         // When
-        $table = $this->gamseServiceUnderTest->getTable();
+        $table = $this->gameServiceUnderTest->getTable();
         // Then
         $this->assertSame(0, $table->countPlayers());
         $this->assertCount(0, $table->getCardDeck());
@@ -54,7 +56,7 @@ class GameServiceTest extends TestCase
         ];
 
         // When
-        $actual = $this->gamseServiceUnderTest->addPlayers($players)->getTable();
+        $actual = $this->gameServiceUnderTest->addPlayers($players)->getTable();
         // Then
         $this->assertSame(3, $actual->countPlayers());
     }
@@ -62,15 +64,37 @@ class GameServiceTest extends TestCase
     public function testShouldReturnTrueWhenGameIsStarted()
     {
         // Given
-        $this->gamseServiceUnderTest->getTable()->addCardCollectionToDeck(
+        $this->gameServiceUnderTest->getTable()->addCardCollectionToDeck(
             new CardCollection(
                 [
-                    new Card(Card::COLOR_DIAMOND, Card::VALUE_FOUR),
+                    new Card(Card::COLOR_HEART, Card::VALUE_TWO),
+                    new Card(Card::COLOR_HEART, Card::VALUE_THREE),
+                    new Card(Card::COLOR_HEART, Card::VALUE_FOUR),
+                    new Card(Card::COLOR_HEART, Card::VALUE_JACK),
+                    new Card(Card::COLOR_HEART, Card::VALUE_QUEEN),
+                    new Card(Card::COLOR_HEART, Card::VALUE_KING),
+                    new Card(Card::COLOR_HEART, Card::VALUE_ACE),
+
+                    new Card(Card::COLOR_SPADE, Card::VALUE_TWO),
+                    new Card(Card::COLOR_SPADE, Card::VALUE_THREE),
+                    new Card(Card::COLOR_SPADE, Card::VALUE_FOUR),
+                    new Card(Card::COLOR_SPADE, Card::VALUE_JACK),
+                    new Card(Card::COLOR_SPADE, Card::VALUE_QUEEN),
+                    new Card(Card::COLOR_SPADE, Card::VALUE_KING),
+                    new Card(Card::COLOR_SPADE, Card::VALUE_ACE),
+
+                    new Card(Card::COLOR_CLUB, Card::VALUE_TWO),
+                    new Card(Card::COLOR_CLUB, Card::VALUE_THREE),
+                    new Card(Card::COLOR_CLUB, Card::VALUE_FOUR),
+                    new Card(Card::COLOR_CLUB, Card::VALUE_JACK),
+                    new Card(Card::COLOR_CLUB, Card::VALUE_QUEEN),
+                    new Card(Card::COLOR_CLUB, Card::VALUE_KING),
+                    new Card(Card::COLOR_CLUB, Card::VALUE_ACE),
                 ]
             )
         );
 
-        $this->gamseServiceUnderTest->addPlayers(
+        $this->gameServiceUnderTest->addPlayers(
             [
                 new Player('Andy'),
                 new Player('Tom'),
@@ -79,8 +103,8 @@ class GameServiceTest extends TestCase
         );
 
         // When
-        $this->gamseServiceUnderTest->startGame();
-        $actual = $this->gamseServiceUnderTest->isStarted();
+        $this->gameServiceUnderTest->startGame();
+        $actual = $this->gameServiceUnderTest->isStarted();
         // Then
         $this->assertTrue($actual);
     }
@@ -116,7 +140,7 @@ class GameServiceTest extends TestCase
 
         // When
         /** @var Table $table */
-        $table = $this->gamseServiceUnderTest->prepareCardDeck();
+        $table = $this->gameServiceUnderTest->prepareCardDeck();
         // Then
         $this->assertCount(2, $table->getCardDeck());
         $this->assertCount(0, $table->getPlayedCards());
@@ -129,13 +153,13 @@ class GameServiceTest extends TestCase
         $this->expectException(GameException::class);
         $this->expectExceptionMessage('Prepare card deck before game start');
         // When
-        $this->gamseServiceUnderTest->startGame();
+        $this->gameServiceUnderTest->startGame();
     }
 
     public function testShouldThrowExceptionWhenStartGameWithoutMinimalPlayers()
     {
         // Given
-        $this->gamseServiceUnderTest->getTable()->addCardCollectionToDeck(
+        $this->gameServiceUnderTest->getTable()->addCardCollectionToDeck(
             new CardCollection(
                 [
                     new Card(Card::COLOR_DIAMOND, Card::VALUE_FOUR),
@@ -146,6 +170,153 @@ class GameServiceTest extends TestCase
         $this->expectException(GameException::class);
         $this->expectExceptionMessage('You need minimum 2 players to start game');
         // When
-        $this->gamseServiceUnderTest->startGame();
+        $this->gameServiceUnderTest->startGame();
     }
+
+
+    public function testShouldChooseNoActionCardAsFirstPlayedCardWhenStartGame()
+    {
+        // Given
+        $table = $this->gameServiceUnderTest->getTable();
+        $noActionCard = new Card(Card::COLOR_CLUB, Card::VALUE_FIVE);
+
+        $collection = new CardCollection(
+            [
+                new Card(Card::COLOR_HEART, Card::VALUE_TWO),
+                $noActionCard,
+                new Card(Card::COLOR_HEART, Card::VALUE_TWO),
+                new Card(Card::COLOR_HEART, Card::VALUE_THREE),
+                new Card(Card::COLOR_HEART, Card::VALUE_FOUR),
+                new Card(Card::COLOR_HEART, Card::VALUE_JACK),
+                new Card(Card::COLOR_HEART, Card::VALUE_QUEEN),
+                new Card(Card::COLOR_HEART, Card::VALUE_KING),
+                new Card(Card::COLOR_HEART, Card::VALUE_ACE),
+
+                new Card(Card::COLOR_SPADE, Card::VALUE_TWO),
+                new Card(Card::COLOR_SPADE, Card::VALUE_THREE),
+                new Card(Card::COLOR_SPADE, Card::VALUE_FOUR),
+                new Card(Card::COLOR_SPADE, Card::VALUE_JACK),
+                new Card(Card::COLOR_SPADE, Card::VALUE_QUEEN),
+                new Card(Card::COLOR_SPADE, Card::VALUE_KING),
+                new Card(Card::COLOR_SPADE, Card::VALUE_ACE),
+
+                new Card(Card::COLOR_CLUB, Card::VALUE_TWO),
+                new Card(Card::COLOR_CLUB, Card::VALUE_THREE),
+                new Card(Card::COLOR_CLUB, Card::VALUE_FOUR),
+                new Card(Card::COLOR_CLUB, Card::VALUE_JACK),
+                new Card(Card::COLOR_CLUB, Card::VALUE_QUEEN),
+                new Card(Card::COLOR_CLUB, Card::VALUE_KING),
+                new Card(Card::COLOR_CLUB, Card::VALUE_ACE),
+            ]
+        );
+
+        $this->gameServiceUnderTest->addPlayers(
+            [
+                new Player('Andy'),
+                new Player('Max'),
+            ]
+        );
+
+        $table->addCardCollectionToDeck($collection);
+        $this->cardServiceMock->expects($this->once())
+            ->method('pickFirstNoActionCard')
+            ->willReturn($noActionCard);
+
+        // When
+        $this->gameServiceUnderTest->startGame();
+
+        // Then
+        $this->assertCount(1, $table->getPlayedCards());
+        $this->assertSame($noActionCard, $table->getPlayedCards()->pickCard());
+    }
+
+
+    public function testShouldThrowGameExceptionWhenCardServiceThrowException()
+    {
+        // Expect
+        $notFoundException = new CardNotFoundException('No regular cards in collection');
+        $gameException = new GameException('The game needs help!', $notFoundException);
+
+        $this->expectExceptionObject($gameException);
+        $this->expectExceptionMessage('The game needs help! Issue: No regular cards in collection');
+
+        // Given
+        $table = $this->gameServiceUnderTest->getTable();
+        $collection = new CardCollection([
+            new Card(Card::COLOR_DIAMOND, Card::VALUE_FIVE)
+        ]);
+        $table->addCardCollectionToDeck($collection);
+
+        $this->gameServiceUnderTest->addPlayers(
+            [
+                new Player('Andy'),
+                new Player('Max'),
+            ]
+        );
+
+        $this->cardServiceMock->expects($this->once())
+            ->method('pickFirstNoActionCard')
+            ->with($collection)
+            ->willThrowException($notFoundException);
+        // When
+        $this->gameServiceUnderTest->startGame();
+        
+    }
+    
+    public function testShouldPlayersTakesFiveCardsFromDeckOnStartGame()
+    {
+        // Given
+        $players = [
+            new Player('Andy'),
+            new Player('Tom'),
+            new Player('Max'),
+        ];
+        $this->gameServiceUnderTest->addPlayers($players);
+
+        $table = $this->gameServiceUnderTest->getTable();
+        $noActionCard = new Card(Card::COLOR_DIAMOND, Card::VALUE_FIVE);
+
+        $collection = new CardCollection(
+            [
+                new Card(Card::COLOR_HEART, Card::VALUE_TWO),
+                new Card(Card::COLOR_HEART, Card::VALUE_THREE),
+                new Card(Card::COLOR_HEART, Card::VALUE_FOUR),
+                new Card(Card::COLOR_HEART, Card::VALUE_JACK),
+                new Card(Card::COLOR_HEART, Card::VALUE_QUEEN),
+                new Card(Card::COLOR_HEART, Card::VALUE_KING),
+                new Card(Card::COLOR_HEART, Card::VALUE_ACE),
+
+                new Card(Card::COLOR_SPADE, Card::VALUE_TWO),
+                new Card(Card::COLOR_SPADE, Card::VALUE_THREE),
+                new Card(Card::COLOR_SPADE, Card::VALUE_FOUR),
+                new Card(Card::COLOR_SPADE, Card::VALUE_JACK),
+                new Card(Card::COLOR_SPADE, Card::VALUE_QUEEN),
+                new Card(Card::COLOR_SPADE, Card::VALUE_KING),
+                new Card(Card::COLOR_SPADE, Card::VALUE_ACE),
+
+                new Card(Card::COLOR_CLUB, Card::VALUE_TWO),
+                new Card(Card::COLOR_CLUB, Card::VALUE_THREE),
+                new Card(Card::COLOR_CLUB, Card::VALUE_FOUR),
+                new Card(Card::COLOR_CLUB, Card::VALUE_JACK),
+                new Card(Card::COLOR_CLUB, Card::VALUE_QUEEN),
+                new Card(Card::COLOR_CLUB, Card::VALUE_KING),
+                new Card(Card::COLOR_CLUB, Card::VALUE_ACE),
+                $noActionCard
+            ]
+        );
+
+        $table->addCardCollectionToDeck($collection);
+        $this->cardServiceMock->expects($this->once())
+            ->method('pickFirstNoActionCard')
+            ->with($collection)
+            ->willReturn($noActionCard);
+        // When
+        $this->gameServiceUnderTest->startGame();
+        // Then
+        foreach ($players as $player) {
+            $this->assertCount(5, $player->getCards());
+        }
+
+    }
+
 }
